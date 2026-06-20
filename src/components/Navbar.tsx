@@ -25,13 +25,13 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 cursor-pointer">
-            <Image src="/logo.jpg" alt="Suhu Laptop" width={44} height={44} className="h-11 w-11 object-cover rounded-2xl shadow-sm" priority />
-            <div className="flex flex-col justify-center gap-0.5">
-              <span className="font-extrabold text-xl text-purple-900 leading-tight tracking-tight">Suhu Laptop</span>
-              <span className="text-[11px] text-purple-400 font-semibold leading-tight tracking-wide uppercase">Sewa Tanpa Ribet</span>
+          <Link href="/" className="flex items-center gap-2.5 cursor-pointer">
+            <Image src="/logo.jpg" alt="Suhu Laptop" width={36} height={36} className="h-9 w-9 object-cover rounded-xl" priority />
+            <div className="flex flex-col justify-center">
+              <span className="font-extrabold text-base text-purple-900 leading-tight tracking-tight">Suhu Laptop</span>
+              <span className="text-[10px] text-purple-400 font-semibold leading-tight tracking-wider uppercase">Sewa Tanpa Ribet</span>
             </div>
           </Link>
 
