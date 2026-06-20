@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   description:
     "Sewa laptop di Bandar Lampung. Tersedia Laptop i3, i5, dan MacBook. Proses booking online mudah, tanpa ribet via WhatsApp. Harga mulai Rp149.000/hari.",
   keywords: "sewa laptop lampung, rental laptop bandar lampung, sewa laptop murah",
+  icons: {
+    icon: "/favicon-rounded.png",
+    apple: "/favicon-rounded.png",
+  },
 };
 
 export default function RootLayout({
