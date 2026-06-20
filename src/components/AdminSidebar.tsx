@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Laptop, LayoutDashboard, ShoppingBag, Users,
+  LayoutDashboard, ShoppingBag, Users,
   AlertTriangle, LogOut, TrendingUp, X, Menu
 } from "lucide-react";
 import { useState } from "react";
@@ -34,13 +35,11 @@ export default function AdminSidebar() {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="p-5 border-b border-purple-100">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl flex items-center justify-center">
-            <Laptop className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="font-bold text-purple-900 leading-none">Suhu Laptop</p>
-            <p className="text-xs text-purple-400 mt-0.5">Admin Panel</p>
+        <div className="flex items-center gap-3">
+          <Image src="/logo.jpg" alt="Suhu Laptop" width={40} height={40} className="h-10 w-10 object-cover rounded-xl shadow-sm flex-shrink-0" />
+          <div className="flex flex-col justify-center gap-0.5">
+            <p className="font-extrabold text-purple-900 leading-tight text-base">Suhu Laptop</p>
+            <p className="text-[10px] text-purple-400 font-semibold uppercase tracking-wide leading-tight">Admin Panel</p>
           </div>
         </div>
       </div>

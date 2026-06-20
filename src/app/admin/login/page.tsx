@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Laptop, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import Image from "next/image";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -41,11 +42,13 @@ export default function AdminLoginPage() {
       <div className="relative z-10 w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-            <Laptop className="w-8 h-8 text-white" />
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <Image src="/logo.jpg" alt="Suhu Laptop" width={52} height={52} className="h-13 w-13 object-cover rounded-2xl shadow-xl border-2 border-white/30" />
+            <div className="text-left">
+              <h1 className="text-2xl font-extrabold text-white leading-tight">Suhu Laptop</h1>
+              <p className="text-purple-300 text-xs font-semibold uppercase tracking-widest">Admin Dashboard</p>
+            </div>
           </div>
-          <h1 className="text-2xl font-extrabold text-white">Suhu Laptop</h1>
-          <p className="text-purple-200 text-sm">Admin Dashboard</p>
         </div>
 
         {/* Card */}
