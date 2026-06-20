@@ -89,9 +89,7 @@ export default function AdminSidebar() {
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-purple-100 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-purple-700 rounded-lg flex items-center justify-center">
-            <Laptop className="w-4 h-4 text-white" />
-          </div>
+          <Image src="/logo.jpg" alt="Suhu Laptop" width={32} height={32} className="h-8 w-8 object-cover rounded-lg" />
           <span className="font-bold text-purple-900 text-sm">Admin Panel</span>
         </div>
         <button onClick={() => setOpen(true)} className="p-2 cursor-pointer text-purple-700">
