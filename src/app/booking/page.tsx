@@ -984,22 +984,18 @@ function Step6({ data }: { data: BookingData }) {
         </div>
       </div>
 
-      {/* QRIS Placeholder */}
+      {/* QRIS */}
       <div className="bg-white border-2 border-purple-200 rounded-2xl p-5 text-center">
-        <p className="font-bold text-purple-800 mb-3">Scan QRIS untuk Bayar</p>
-        <div className="w-48 h-48 bg-purple-50 border-2 border-dashed border-purple-300 rounded-xl flex items-center justify-center mx-auto mb-3">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-purple-200 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <CreditCard className="w-6 h-6 text-purple-600" />
-            </div>
-            <p className="text-purple-400 text-xs font-medium">QRIS akan diisi</p>
-            <p className="text-purple-400 text-xs">oleh pemilik</p>
-          </div>
+        <p className="font-bold text-purple-800 mb-1">Scan QRIS untuk Bayar</p>
+        <p className="text-purple-400 text-xs mb-4">Screenshot lalu buka aplikasi dompet digital / m-banking</p>
+        <div className="flex justify-center mb-4">
+          <img src="/qris.jpg" alt="QRIS Suhu Laptop" className="w-56 h-56 object-contain rounded-xl border border-purple-100 shadow-sm" />
         </div>
-        <div className="bg-purple-50 rounded-xl px-4 py-2 inline-block">
-          <p className="text-purple-600 text-xs font-medium">Nominal Transfer</p>
-          <p className="text-purple-900 font-bold text-lg">{formatRupiah(total)}</p>
+        <div className="bg-purple-50 rounded-xl px-4 py-3 inline-block">
+          <p className="text-purple-600 text-xs font-medium mb-0.5">Nominal Transfer</p>
+          <p className="text-purple-900 font-bold text-2xl">{formatRupiah(total)}</p>
         </div>
+        <p className="text-xs text-purple-400 mt-3">Setelah bayar, kirim bukti ke WhatsApp admin</p>
       </div>
 
       {/* Action buttons */}
