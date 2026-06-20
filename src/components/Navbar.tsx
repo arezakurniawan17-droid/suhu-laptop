@@ -28,7 +28,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 cursor-pointer">
-            <Image src="/logo.PNG" alt="Suhu Laptop" width={40} height={40} className="h-10 w-10 object-contain rounded-xl" priority />
+            <Image src="/logo.jpg" alt="Suhu Laptop" width={40} height={40} className="h-10 w-10 object-contain rounded-xl" priority />
             <div>
               <span className="font-bold text-lg text-purple-900 leading-none block">Suhu Laptop</span>
               <span className="text-[10px] text-purple-500 font-medium leading-none">Sewa Tanpa Ribet</span>

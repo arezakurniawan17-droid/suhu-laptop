@@ -435,7 +435,7 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 mb-10">
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <Image src="/logo.PNG" alt="Suhu Laptop" width={140} height={48} className="h-12 w-auto object-contain brightness-0 invert" />
+                  <Image src="/logo.jpg" alt="Suhu Laptop" width={140} height={48} className="h-12 w-auto object-contain brightness-0 invert" />
                 </div>
                 <p className="text-purple-300 text-sm leading-relaxed">
                   Sewa laptop harian terpercaya di Bandar Lampung. Booking online, ambil di outlet.
