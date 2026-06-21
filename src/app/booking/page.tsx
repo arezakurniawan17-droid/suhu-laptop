@@ -803,102 +803,122 @@ function Step6({ data }: { data: BookingData }) {
       const { default: jsPDF } = await import("jspdf");
       const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-      const margin = 20;
+      const margin = 18;
+      const pageW = 210;
+      const contentW = pageW - margin * 2;
       let y = margin;
 
-      // Header
-      doc.setFillColor(124, 58, 237);
-      doc.rect(0, 0, 210, 35, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(16);
-      doc.setFont("helvetica", "bold");
-      doc.text("SUHU LAPTOP LAMPUNG", 105, 15, { align: "center" });
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.text("SURAT PERJANJIAN SEWA MENYEWA", 105, 25, { align: "center" });
-      y = 45;
+      // ── Header ──────────────────────────────────────────────
+      doc.setFillColor(109, 40, 217);
+      doc.rect(0, 0, pageW, 38, "F");
 
-      doc.setTextColor(30, 27, 75);
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
+      // Logo
+      try {
+        const logoRes = await fetch("/logo.jpg");
+        const logoBlob = await logoRes.blob();
+        const logoB64 = await new Promise<string>((res) => {
+          const reader = new FileReader();
+          reader.onloadend = () => res(reader.result as string);
+          reader.readAsDataURL(logoBlob);
+        });
+        doc.addImage(logoB64, "JPEG", margin, 5, 28, 28);
+        // Title beside logo
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(15);
+        doc.setFont("helvetica", "bold");
+        doc.text("SUHU LAPTOP LAMPUNG", margin + 32, 17);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.text("SURAT PERJANJIAN SEWA MENYEWA", margin + 32, 25);
+      } catch {
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(15);
+        doc.setFont("helvetica", "bold");
+        doc.text("SUHU LAPTOP LAMPUNG", 105, 16, { align: "center" });
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.text("SURAT PERJANJIAN SEWA MENYEWA", 105, 24, { align: "center" });
+      }
+      y = 46;
+
+      doc.setTextColor(20, 14, 60);
+      doc.setDrawColor(109, 40, 217);
+
+      const addSection = (title: string) => {
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text(title, margin, y);
+        y += 2;
+        doc.setLineWidth(0.4);
+        doc.line(margin, y, margin + contentW, y);
+        y += 5;
+      };
 
       const addLine = (label: string, value: string) => {
+        doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
         doc.text(label + ":", margin, y);
         doc.setFont("helvetica", "normal");
-        doc.text(value, margin + 55, y);
-        y += 7;
+        doc.text(value, margin + 48, y);
+        y += 6;
       };
 
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "bold");
-      doc.text("DATA PENYEWA", margin, y);
-      y += 2;
-      doc.setDrawColor(124, 58, 237);
-      doc.line(margin, y, 190, y);
-      y += 6;
-
+      // ── Data Penyewa ─────────────────────────────────────────
+      addSection("DATA PENYEWA");
       addLine("Nama", data.nama);
       addLine("No. HP", data.noHp);
       addLine("Username IG", "@" + data.usernameIg);
       addLine("Profesi", data.profesi);
       addLine("Nama Instansi", data.namaInstansi);
       addLine("No. HP Darurat", data.noHpDarurat);
-      y += 2;
 
+      doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       doc.text("Alamat:", margin, y);
-      y += 6;
       doc.setFont("helvetica", "normal");
-      const alamatLines = doc.splitTextToSize(data.alamat, 150);
-      doc.text(alamatLines, margin, y);
-      y += alamatLines.length * 6 + 4;
+      const alamatLines = doc.splitTextToSize(data.alamat, contentW - 48);
+      doc.text(alamatLines, margin + 48, y);
+      y += Math.max(alamatLines.length * 5, 5) + 4;
 
-      doc.line(margin, y, 190, y);
-      y += 8;
-
-      doc.setFont("helvetica", "bold");
-      doc.text("DETAIL SEWA", margin, y);
-      y += 2;
-      doc.line(margin, y, 190, y);
+      doc.setLineWidth(0.2);
+      doc.setDrawColor(200, 190, 230);
+      doc.line(margin, y, margin + contentW, y);
       y += 6;
 
+      // ── Detail Sewa ──────────────────────────────────────────
+      doc.setDrawColor(109, 40, 217);
+      addSection("DETAIL SEWA");
       addLine("Kategori", info.label + " (" + info.spek + ")");
       addLine("Durasi", data.durasi + " hari");
       addLine("Tanggal Ambil", formatTanggalShort(data.tanggalAmbil!) + " pukul " + data.jamAmbil + " WIB");
       addLine("Tanggal Kembali", formatTanggalShort(tanggalKembali.tanggal) + " pukul " + tanggalKembali.jam + " WIB");
       addLine("Bundling", "Laptop + Charger + Tas Laptop");
       addLine("Denda Telat", "Rp10.000/jam");
-      y += 2;
+      y += 1;
 
-      doc.setFillColor(124, 58, 237);
+      // Total bayar box
+      doc.setFillColor(109, 40, 217);
       doc.setTextColor(255, 255, 255);
-      doc.roundedRect(margin, y, 170, 14, 3, 3, "F");
-      doc.setFontSize(12);
+      doc.roundedRect(margin, y, contentW, 12, 2, 2, "F");
+      doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text("TOTAL BAYAR: " + formatRupiah(total), 105, y + 9, { align: "center" });
-      y += 22;
-      doc.setTextColor(30, 27, 75);
-      doc.setFontSize(10);
+      doc.text("TOTAL BAYAR: " + formatRupiah(total), 105, y + 8, { align: "center" });
+      y += 18;
+      doc.setTextColor(20, 14, 60);
 
-      doc.setFont("helvetica", "bold");
-      doc.text("DOKUMEN JAMINAN", margin, y);
-      y += 2;
-      doc.line(margin, y, 190, y);
-      y += 6;
+      // ── Dokumen Jaminan ──────────────────────────────────────
+      addSection("DOKUMEN JAMINAN");
+      doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
       data.jaminan.forEach((j) => {
         const label = JAMINAN_OPTIONS.find((opt) => opt.id === j)?.label ?? j;
-        doc.text("• " + label + " a/n " + data.nama, margin + 5, y);
-        y += 6;
+        doc.text("• " + label + " a/n " + data.nama, margin + 4, y);
+        y += 5;
       });
-      y += 4;
+      y += 3;
 
-      doc.setFont("helvetica", "bold");
-      doc.text("KETENTUAN", margin, y);
-      y += 2;
-      doc.line(margin, y, 190, y);
-      y += 6;
+      // ── Ketentuan ────────────────────────────────────────────
+      addSection("KETENTUAN");
       const ketentuan = [
         "1. Penyewa bertanggung jawab menjaga barang sewaan. Denda keterlambatan Rp10.000/jam.",
         "2. Kerusakan selama sewa ditanggung penyewa.",
@@ -907,27 +927,35 @@ function Step6({ data }: { data: BookingData }) {
         "5. No refund setelah pembayaran dikonfirmasi.",
       ];
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
+      doc.setFontSize(8.5);
       ketentuan.forEach((k) => {
-        const lines = doc.splitTextToSize(k, 165);
+        const lines = doc.splitTextToSize(k, contentW);
         doc.text(lines, margin, y);
-        y += lines.length * 5 + 2;
+        y += lines.length * 4.5 + 1.5;
       });
-      y += 6;
+      y += 5;
 
-      doc.setFontSize(10);
+      // ── TTD ──────────────────────────────────────────────────
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
       doc.text("Bandar Lampung, " + formatTanggalShort(new Date()), margin, y);
-      y += 14;
+      y += 5;
 
       if (data.ttdBase64) {
-        doc.addImage(data.ttdBase64, "PNG", margin, y, 60, 25);
-        y += 28;
+        doc.addImage(data.ttdBase64, "PNG", margin, y, 55, 28);
+        y += 30;
+      } else {
+        y += 30;
       }
 
-      doc.line(margin, y, margin + 60, y);
+      doc.setLineWidth(0.4);
+      doc.setDrawColor(20, 14, 60);
+      doc.line(margin, y, margin + 55, y);
       y += 5;
+      doc.setFont("helvetica", "bold");
       doc.text(data.nama, margin, y);
       y += 5;
+      doc.setFont("helvetica", "normal");
       doc.text("Penyewa", margin, y);
 
       const filename = `SuhuLaptop_${data.nama.replace(/\s+/g, "_")}_${data.tanggalAmbil?.toISOString().split("T")[0]}.pdf`;

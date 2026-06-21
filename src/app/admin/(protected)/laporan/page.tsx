@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import LaporanClient from '@/components/LaporanClient'
 
 export const revalidate = 0

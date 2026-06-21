@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import AdminDashboardClient from '@/components/AdminDashboardClient'
 
 export const revalidate = 0
