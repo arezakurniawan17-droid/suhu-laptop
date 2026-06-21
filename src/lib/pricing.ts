@@ -105,15 +105,22 @@ export function buatPesanWA(data: {
   tanggalAmbil: string;
   jamAmbil: string;
   total: number;
+  metodeBayar?: "full" | "dp";
+  dpBayar?: number;
 }): string {
-  const msg = `Halo Admin Suhu Laptop, saya sudah melakukan pembayaran sewa laptop.
+  const isDP = data.metodeBayar === "dp" && data.dpBayar !== undefined;
+  const bayarLine = isDP
+    ? `DP Dibayar : ${formatRupiah(data.dpBayar!)} (50%)\nPelunasan  : ${formatRupiah(data.total - data.dpBayar!)} (dibayar di tempat saat ambil)`
+    : `Total      : ${formatRupiah(data.total)}`;
+
+  const msg = `Halo Admin Suhu Laptop, saya sudah melakukan ${isDP ? "pembayaran DP" : "pembayaran"} sewa laptop.
 
 Nama      : ${data.nama}
 Kategori  : ${data.kategori}
 Durasi    : ${data.durasi} hari
 Tgl ambil : ${data.tanggalAmbil} pukul ${data.jamAmbil} WIB
-Total     : ${formatRupiah(data.total)}
+${bayarLine}
 
-(Lampirkan screenshot bukti transfer)`;
+(Lampirkan screenshot bukti transfer${isDP ? " DP" : ""})`;
   return encodeURIComponent(msg);
 }

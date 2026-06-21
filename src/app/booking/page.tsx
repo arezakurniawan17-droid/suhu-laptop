@@ -33,6 +33,7 @@ interface BookingData {
   jaminan: string[];
   ttdBase64: string;
   setuju: boolean;
+  metodeBayar: "full" | "dp";
 }
 
 const STEP_LABELS = [
@@ -311,10 +312,11 @@ function Step2({ data, setData }: { data: BookingData; setData: (d: BookingData)
 }
 
 // ── STEP 3: Summary Harga ──────────────────────────────────────
-function Step3({ data }: { data: BookingData }) {
+function Step3({ data, setData }: { data: BookingData; setData: (d: BookingData) => void }) {
   if (!data.kategori || !data.tanggalAmbil) return null;
   const info = KATEGORI_INFO[data.kategori];
   const total = hitungHarga(data.kategori, data.durasi);
+  const dp = Math.ceil(total / 2);
   const isPromo = data.durasi === 3;
   const tanggalKembali = hitungTanggalKembali(data.tanggalAmbil, data.jamAmbil, data.durasi);
 
@@ -380,6 +382,58 @@ function Step3({ data }: { data: BookingData }) {
         </div>
         <p className="text-3xl font-extrabold text-purple-900">{formatRupiah(total)}</p>
         <p className="text-purple-500 text-xs mt-1">Bayar via QRIS setelah invoice dibuat</p>
+      </div>
+
+      {/* Pilihan metode bayar */}
+      <div>
+        <p className="text-sm font-semibold text-purple-800 mb-3">Metode Pembayaran</p>
+        <div className="grid grid-cols-1 gap-3">
+          <button
+            onClick={() => setData({ ...data, metodeBayar: "full" })}
+            className={`flex items-start gap-4 p-4 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+              data.metodeBayar === "full"
+                ? "border-purple-600 bg-purple-50 shadow-md shadow-purple-100"
+                : "border-purple-100 bg-white hover:border-purple-300"
+            }`}
+          >
+            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-all ${
+              data.metodeBayar === "full" ? "border-purple-600 bg-purple-600" : "border-purple-300"
+            }`}>
+              {data.metodeBayar === "full" && <div className="w-2 h-2 rounded-full bg-white" />}
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-purple-900">Bayar Lunas Sekarang</p>
+              <p className="text-purple-500 text-xs mt-0.5">Transfer penuh via QRIS sebelum pengambilan</p>
+              <p className="text-purple-700 font-extrabold text-lg mt-1">{formatRupiah(total)}</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setData({ ...data, metodeBayar: "dp" })}
+            className={`flex items-start gap-4 p-4 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+              data.metodeBayar === "dp"
+                ? "border-green-500 bg-green-50 shadow-md shadow-green-100"
+                : "border-purple-100 bg-white hover:border-purple-300"
+            }`}
+          >
+            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-all ${
+              data.metodeBayar === "dp" ? "border-green-500 bg-green-500" : "border-purple-300"
+            }`}>
+              {data.metodeBayar === "dp" && <div className="w-2 h-2 rounded-full bg-white" />}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-bold text-purple-900">DP 50% Sekarang</p>
+                <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">FLEKSIBEL</span>
+              </div>
+              <p className="text-purple-500 text-xs mt-0.5">Sisa 50% dilunasi saat pengambilan di tempat</p>
+              <div className="mt-1 flex items-baseline gap-2 flex-wrap">
+                <p className="text-green-700 font-extrabold text-lg">{formatRupiah(dp)}</p>
+                <p className="text-purple-400 text-xs">+ sisa {formatRupiah(total - dp)} di tempat</p>
+              </div>
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* Denda info */}
@@ -734,6 +788,9 @@ function Step6({ data }: { data: BookingData }) {
 
   const info = KATEGORI_INFO[data.kategori];
   const total = hitungHarga(data.kategori, data.durasi);
+  const dp = Math.ceil(total / 2);
+  const isDP = data.metodeBayar === "dp";
+  const bayarSekarang = isDP ? dp : total;
   const tanggalKembali = hitungTanggalKembali(data.tanggalAmbil, data.jamAmbil, data.durasi);
 
   const handleSaveAndWA = async () => {
@@ -757,6 +814,8 @@ function Step6({ data }: { data: BookingData }) {
         jam_kembali: tanggalKembaliObj.jam + ":00",
         jaminan: data.jaminan,
         total_bayar: total,
+        metode_bayar: data.metodeBayar,
+        dp_bayar: isDP ? dp : null,
         status: "pending",
         ttd_base64: data.ttdBase64 || null,
       }).select("id").single();
@@ -791,6 +850,8 @@ function Step6({ data }: { data: BookingData }) {
       tanggalAmbil: formatTanggalShort(data.tanggalAmbil!),
       jamAmbil: data.jamAmbil,
       total,
+      metodeBayar: data.metodeBayar,
+      dpBayar: isDP ? dp : undefined,
     });
 
     window.open(`https://wa.me/${WA_NUMBER}?text=${pesanWA}`, "_blank");
@@ -899,11 +960,22 @@ function Step6({ data }: { data: BookingData }) {
       // Total bayar box
       doc.setFillColor(109, 40, 217);
       doc.setTextColor(255, 255, 255);
-      doc.roundedRect(margin, y, contentW, 12, 2, 2, "F");
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text("TOTAL BAYAR: " + formatRupiah(total), 105, y + 8, { align: "center" });
-      y += 18;
+      if (isDP) {
+        doc.roundedRect(margin, y, contentW, 18, 2, 2, "F");
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text("TOTAL SEWA: " + formatRupiah(total), 105, y + 6, { align: "center" });
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.text("DP Sekarang: " + formatRupiah(dp) + "  |  Pelunasan di tempat: " + formatRupiah(total - dp), 105, y + 13, { align: "center" });
+        y += 24;
+      } else {
+        doc.roundedRect(margin, y, contentW, 12, 2, 2, "F");
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text("TOTAL BAYAR: " + formatRupiah(total), 105, y + 8, { align: "center" });
+        y += 18;
+      }
       doc.setTextColor(20, 14, 60);
 
       // ── Dokumen Jaminan ──────────────────────────────────────
@@ -1003,11 +1075,26 @@ function Step6({ data }: { data: BookingData }) {
             <span className="text-purple-500">Kembali</span>
             <span className="font-semibold text-purple-900">{formatTanggalShort(tanggalKembali.tanggal)} · {tanggalKembali.jam} WIB</span>
           </div>
-          <div className="border-t-2 border-purple-100 pt-3 mt-1">
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-purple-800">Total Bayar</span>
-              <span className="text-2xl font-extrabold text-purple-900">{formatRupiah(total)}</span>
+          <div className="border-t-2 border-purple-100 pt-3 mt-1 flex flex-col gap-2">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-purple-500">Total Sewa</span>
+              <span className="font-semibold text-purple-700">{formatRupiah(total)}</span>
             </div>
+            {isDP && (
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-purple-500">Sisa Pelunasan</span>
+                <span className="font-semibold text-orange-600">{formatRupiah(total - dp)} (di tempat)</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center bg-purple-50 rounded-xl px-3 py-2 mt-1">
+              <span className="font-bold text-purple-800">{isDP ? "DP yang Dibayar" : "Total Bayar"}</span>
+              <span className="text-2xl font-extrabold text-purple-900">{formatRupiah(bayarSekarang)}</span>
+            </div>
+            {isDP && (
+              <div className="bg-green-50 border border-green-200 rounded-xl px-3 py-2 text-xs text-green-700 text-center font-medium">
+                Bayar DP sekarang · Lunasi {formatRupiah(total - dp)} saat ambil laptop
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1019,10 +1106,15 @@ function Step6({ data }: { data: BookingData }) {
         <div className="flex justify-center mb-4">
           <img src="/qris.jpg" alt="QRIS Suhu Laptop" className="w-56 h-56 object-contain rounded-xl border border-purple-100 shadow-sm" />
         </div>
-        <div className="bg-purple-50 rounded-xl px-4 py-3 inline-block">
-          <p className="text-purple-600 text-xs font-medium mb-0.5">Nominal Transfer</p>
-          <p className="text-purple-900 font-bold text-2xl">{formatRupiah(total)}</p>
+        <div className={`rounded-xl px-4 py-3 inline-block ${isDP ? "bg-green-50" : "bg-purple-50"}`}>
+          <p className={`text-xs font-medium mb-0.5 ${isDP ? "text-green-600" : "text-purple-600"}`}>
+            {isDP ? "Nominal DP (50%)" : "Nominal Transfer"}
+          </p>
+          <p className={`font-bold text-2xl ${isDP ? "text-green-700" : "text-purple-900"}`}>{formatRupiah(bayarSekarang)}</p>
         </div>
+        {isDP && (
+          <p className="text-xs text-orange-500 font-medium mt-2">Sisa {formatRupiah(total - dp)} dibayar tunai saat ambil</p>
+        )}
         <p className="text-xs text-purple-400 mt-3">Setelah bayar, kirim bukti ke WhatsApp admin</p>
       </div>
 
@@ -1074,6 +1166,7 @@ export default function BookingPage() {
     jaminan: [],
     ttdBase64: "",
     setuju: false,
+    metodeBayar: "full",
   });
 
   const canNext = (): boolean => {
@@ -1105,7 +1198,7 @@ export default function BookingPage() {
     switch (step) {
       case 0: return <Step1 data={data} setData={setData} />;
       case 1: return <Step2 data={data} setData={setData} />;
-      case 2: return <Step3 data={data} />;
+      case 2: return <Step3 data={data} setData={setData} />;
       case 3: return <Step4 data={data} setData={setData} />;
       case 4: return <Step5 data={data} setData={setData} />;
       case 5: return <Step6 data={data} />;
